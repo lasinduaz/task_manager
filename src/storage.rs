@@ -1,6 +1,6 @@
 use std::os::unix::raw::time_t;
 
-use rusqlite::{Connection, Result};
+use rusqlite::{params, Connection, Result};
 
 pub fn establish_connection() -> Result<()> {
     let conn = Connection::open("task_manager.db").expect("Failed to open db");
@@ -40,4 +40,3 @@ pub fn add_task(
     let id = conn.last_insert_rowid();
     Ok(id)
 }
-)
