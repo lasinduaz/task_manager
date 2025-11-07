@@ -24,3 +24,20 @@ pub fn establish_connection() -> Result<()> {
 
     Ok(())
 }
+pub fn add_task(
+    title: &str,
+    description: &str,
+    status: &str,
+    priority: i32,
+    due_date: Option<&str>,
+) -> Result<i64> {
+    let conn = Connection::open("task_manager.db")?;
+    conn.execute(
+        "INSERT INTO tasks (title, description, status, priority, due_date)
+         VALUES (?1, ?2, ?3, ?4, ?5)",
+        params![title, description, status, priority, due_date],
+    )?;
+    let id = conn.last_insert_rowid();
+    Ok(id)
+}
+)
