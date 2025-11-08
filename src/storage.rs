@@ -4,7 +4,7 @@ use rusqlite::{params, Connection, Result};
 
 pub fn establish_connection() -> Result<()> {
     let conn = Connection::open("task_manager.db").expect("Failed to open db");
-
+    println!("FROM DB");
     let sql = "
         CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

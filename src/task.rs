@@ -1,6 +1,9 @@
 use chrono::Local;
 use std::io::{self, Write};
 
+use crate::storage;
+
+#[derive(Debug)]
 pub struct Task {
     ID: i32,
     title: String,
@@ -44,44 +47,88 @@ pub fn add() -> Task {
     io::stdout().flush().unwrap();
     println!("================================");
 
-    println!("Task Name :");
+    print!("Task Name :");
     io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut title).expect("Failed to read title");
+    io::stdin()
+        .read_line(&mut title)
+        .expect("Failed to read title");
 
-    print!("Task Desciption");
+    print!("Task Desciption :");
     io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut description).expect("Failed to read description");
+    io::stdin()
+        .read_line(&mut description)
+        .expect("Failed to read description");
 
-    print!("Task Status");
+    print!("Task Status('pending', 'in_progress', 'done') :");
     io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut status).expect("Failed to read status");
+    io::stdin()
+        .read_line(&mut status)
+        .expect("Failed to read status");
 
-    println!("Tasl Priority ('1' - Higt , '3' - Low , '2' - Medium)");
+    print!("Task Priority ('1' - Higt ,'2' - Medium,  '3' - Low , ) :");
     io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut priority).expect("Failed to read priority");
+    io::stdin()
+        .read_line(&mut priority)
+        .expect("Failed to read priority");
     let priority_val = priority.trim().parse::<i32>().unwrap_or(1); //get int answer 
 
-    println!("Task Due Date");
+    print!("Task Due Date (YYYY-MM-DD) :");
     io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut due_date).expect("Failed to read due date");
+    io::stdin()
+        .read_line(&mut due_date)
+        .expect("Failed to read due date");
 
-    //get sys date
+    //get syst date
     let now = Local::now();
     created_at = now.format("%Y-%m-%d %H:%M:%S").to_string();
     updated_at = now.format("%Y-%m-%d %H:%M:%S").to_string();
 
-    // build and return the Task
+    //show tasks
+    println!("");
+    println!("================================");
+    println!("Task Name : {}", title.trim());
+    println!("Task Description :{}", description.trim());
+    println!("Task Status : {}", status.trim());
+    println!("Task Priority : {}", priority_val);
+    println!("Task Due Date : {}", due_date.trim());
+    println!("Task Created At : {}", created_at.trim());
+    println!("Task Updated At : {}", updated_at.trim());
+    println!("================================");
+    println!("");
+
+    // normalize inputs into concrete types before constructing Task
+    let final_title = title.trim().to_string();
+    let final_description = description.trim().to_string();
+    let final_status = status.trim().to_string();
+    let final_priority = priority.trim().parse::<i32>().unwrap_or(3);
+    let final_due_date = due_date.trim().to_string();
+
+    //insert values to D&B
+    let db_id = storage::add_task(
+        &final_title,
+        &final_description,
+        &final_status,
+        final_priority,
+        if final_due_date.is_empty() {
+            None
+        } else {
+            Some(final_due_date.as_str())
+        },
+    )
+    .expect("Failed to add task to database");
+
     Task {
-        ID: 0,
-        title: title.trim().to_string(),
-        description: description.trim().to_string(),
-        status: status.trim().to_string(),
-        priority: priority.trim().parse::<i32>().unwrap_or(3),
-        due_date: due_date.trim().to_string(),
+        ID: db_id as i32,
+        title: final_title,
+        description: final_description,
+        status: final_status,
+        priority: final_priority,
+        due_date: final_due_date,
         created_at,
         updated_at,
     }
 }
+
 pub fn view() {
     println!("View tasks here");
 }

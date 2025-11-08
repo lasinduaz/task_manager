@@ -3,16 +3,14 @@ use std::io::{self, Write};
 mod storage;
 mod task; // All functions at
 mod utils; // Print all stuff
+mod test; // for tes
 
 fn main() {
     // db connection — handle errors
-    //storage::establish_connection().expect("Failed to initialize DB");
+    storage::establish_connection().expect("Failed to initialize DB");
 
     let mut choice = String::new();
     utils::menu(&mut choice);
-
-    // debug raw input
-    println!("raw input: {:?}", choice);
 
     // parsing 
     let choice_int: i32 = match choice.trim().parse::<i32>() {
@@ -23,8 +21,12 @@ fn main() {
         }
     };
 
-    println!("Parsed choice: {}", choice_int);
-
     // ensure this function name matches the one in src/task.rs
     task::handle_choies(choice_int);
+
+
+
+
+
+    test::print_added_task();
 }
