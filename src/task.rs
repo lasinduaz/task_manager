@@ -1,7 +1,7 @@
 use chrono::Local;
 use std::io::{self, Write};
 
-use crate::storage;
+use crate::storage::{self, view_tasks};
 
 #[derive(Debug)]
 pub struct Task {
@@ -133,8 +133,35 @@ pub fn view() {
     storage::view_tasks().expect("Failed to view tasks");
 }
 pub fn update() {
+    let mut id_upt = String::new();
+    println!("");
+    println!("================================");
     println!("Update tasks here");
+    println!("================================");
+    println!("Please Enter ID number : ('#' for view tasks)");
+    io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut id_upt).expect("Faild to get ID");
+
+    let input = id_upt.trim();
+    if id_upt == "#" {
+        storage::view_tasks().expect("Faild to get view task ")
+    }
+    //cvt to int
+    let id: i32 = match input.parse() {
+        Ok(n) => n,
+        Err(_) => {
+            eprintln!("PLEASE ENTER A NUMBER");
+            return;
+        }
+    };
+    //pass to db
+    storage::update_task(id);
 }
 pub fn delete() {
     println!("Delete tasks here");
 }
+
+//for update funtion
+// - First need to get id number
+// - Secound sent ID number to update functio at stroage for get data
+// - print those on on here funtion

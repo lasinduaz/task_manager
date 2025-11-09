@@ -76,3 +76,6 @@ pub fn view_tasks() -> Result<()>
  Ok(())
 
 }
+pub fn update_task(priority: i32) -> Result<()> {
+
+}
