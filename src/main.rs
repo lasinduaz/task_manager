@@ -24,9 +24,4 @@ fn main() {
     // ensure this function name matches the one in src/task.rs
     task::handle_choies(choice_int);
 
-
-
-
-
-    test::print_added_task();
 }

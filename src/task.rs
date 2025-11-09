@@ -130,7 +130,7 @@ pub fn add() -> Task {
 }
 
 pub fn view() {
-    println!("View tasks here");
+    storage::view_tasks().expect("Failed to view tasks");
 }
 pub fn update() {
     println!("Update tasks here");
