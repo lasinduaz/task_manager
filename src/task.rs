@@ -1,9 +1,11 @@
 use chrono::Local;
+use core::task;
 use std::io::{self, Write};
 
-use crate::storage::{self, view_tasks};
+use crate::{storage::{self, view_tasks}, utils};
 
 #[derive(Debug)]
+
 pub struct Task {
     ID: i32,
     title: String,
@@ -134,29 +136,71 @@ pub fn view() {
 }
 pub fn update() {
     let mut id_upt = String::new();
-    println!("");
+    println!();
     println!("================================");
     println!("Update tasks here");
     println!("================================");
     println!("Please Enter ID number : ('#' for view tasks)");
     io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut id_upt).expect("Faild to get ID");
+    io::stdin().read_line(&mut id_upt).expect("Failed to get ID");
 
     let input = id_upt.trim();
-    if id_upt == "#" {
-        storage::view_tasks().expect("Faild to get view task ")
+    if input == "#" {
+        storage::view_tasks().expect("Failed to get view task");
+        return;
     }
-    //cvt to int
-    let id: i32 = match input.parse() {
+
+    // convert to int
+    let id: i32 = match input.parse::<i32>() {
         Ok(n) => n,
         Err(_) => {
             eprintln!("PLEASE ENTER A NUMBER");
             return;
         }
     };
-    //pass to db
-    storage::update_task(id);
+
+    // fetch existing status
+    match crate::storage::get_task_status(id) {
+        Ok(None) => {
+            println!("There is no task with ID {}", id);
+            return;
+        }
+        Ok(Some(current_status)) => {
+            println!("=================================");
+            println!("Current Status: {}", current_status);
+        }
+        Err(e) => {
+            eprintln!("DB error: {}", e);
+            return;
+        }
+    }
+
+    // prompt for new status
+    let mut new_status = String::new();
+    print!("Enter new status ('pending', 'in_progress', 'done'): ");
+    io::stdout().flush().unwrap();
+    io::stdin()
+        .read_line(&mut new_status)
+        .expect("Failed to read new status");
+    let new_status = new_status.trim();
+    if new_status.is_empty() {
+        println!("No status entered. Aborting update.");
+        return;
+    }
+
+    // update status in DB
+    match crate::storage::update_task_status(id, new_status) {
+        Ok(0) => println!("No rows updated (id {}).", id),
+        Ok(_) => println!("Task {} status updated to '{}'.", id, new_status),
+        Err(e) => eprintln!("Failed to update status: {}", e),
+    }
+
+    //return to menu
+
+    let mut choice = String::new();
+    utils::menu(&mut choice);
 }
+
 pub fn delete() {
     println!("Delete tasks here");
 }

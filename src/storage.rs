@@ -1,7 +1,7 @@
 use core::task;
 use std::os::unix::raw::time_t;
 
-use rusqlite::{params, Connection, Result};
+use rusqlite::{params, Connection, Result, OptionalExtension};
 
 pub fn establish_connection() -> Result<()> {
     let conn = Connection::open("task_manager.db").expect("Failed to open db");
@@ -76,6 +76,25 @@ pub fn view_tasks() -> Result<()>
  Ok(())
 
 }
-pub fn update_task(priority: i32) -> Result<()> {
+pub fn get_task_status(id: i32) -> Result<Option<String>> {
+    let conn = Connection::open("task_manager.db")?;
+    let mut stmt = conn.prepare("SELECT status FROM tasks WHERE id = ?1")?;
+    // use `.optional()` to get Option<T> instead of error on no rows
+    let status_opt = stmt
+        .query_row(params![id], |row| row.get::<_, String>(0))
+        .optional()?;
+    Ok(status_opt)
+}
 
+// update only the status (and updated_at) for a task id; returns number of rows updated
+pub fn update_task_status(id: i32, status: &str) -> Result<usize> {
+    let conn = Connection::open("task_manager.db")?;
+    let changed = conn.execute(
+        "UPDATE tasks
+         SET status = ?1,
+             updated_at = datetime('now')
+         WHERE id = ?2",
+        params![status, id],
+    )?;
+    Ok(changed)
 }
