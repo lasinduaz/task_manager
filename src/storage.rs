@@ -98,3 +98,9 @@ pub fn update_task_status(id: i32, status: &str) -> Result<usize> {
     )?;
     Ok(changed)
 }
+pub fn delete_task(id:i32) -> Result<usize> {
+    let conn = Connection::open("task_manager.db")?;
+    let mut smt = conn.prepare("DELETE FROM tasks WHERE id = ?1")?;
+    let changed = smt.execute(params![id])?;
+    Ok(changed)
+}

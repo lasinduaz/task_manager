@@ -223,6 +223,7 @@ pub fn delete() {
 
     //cov to int
     let id_mut: i32 = id_dete.trim().parse::<i32>().expect("Invalid integer id");
+    storage::delete_task(id_mut).expect("Failed to delete task");
 
 }
 //for update funtion
