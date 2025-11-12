@@ -1,3 +1,4 @@
+// ...existing code...
 use std::io::{self, Write};
 
 mod storage;
@@ -6,22 +7,28 @@ mod utils; // Print all stuff
 mod test; // for tes
 
 fn main() {
-    // db connection — handle errors
+    // ensure DB exists
     storage::establish_connection().expect("Failed to initialize DB");
 
-    let mut choice = String::new();
-    utils::menu(&mut choice);
+    loop {
+        let mut choice = String::new();
+        utils::menu(&mut choice);
 
-    // parsing 
-    let choice_int: i32 = match choice.trim().parse::<i32>() {
-        Ok(n) => n,
-        Err(_) => {
-            eprintln!("PLEASE ENTER A NUMBER");
-            return;
+        let choice_int: i32 = match choice.trim().parse::<i32>() {
+            Ok(n) => n,
+            Err(_) => {
+                eprintln!("PLEASE ENTER A NUMBER");
+                continue;
+            }
+        };
+
+        // 0 = exit
+        if choice_int == 0 {
+            println!("Goodbye.");
+            break;
         }
-    };
 
-    // ensure this function name matches the one in src/task.rs
-    task::handle_choies(choice_int);
-
+        task::handle_choice(choice_int);
+        println!(); // spacing between iterations
+    }
 }

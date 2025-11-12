@@ -1,3 +1,4 @@
+// ...existing code...
 use std::io::{self, Write};
 
 pub fn menu(choice: &mut String) {
@@ -8,9 +9,13 @@ pub fn menu(choice: &mut String) {
     println!("0. Exit");
     println!("1. Add Task");
     println!("2. View Tasks");
-    println!("3. Update Task");
+    println!("3. Update Task (status only)");
     println!("4. Delete Task");
-    print!("Enter your choice: ");
+    println!("Enter your choice:");
+    print!("> ");
     io::stdout().flush().unwrap();
-    io::stdin().read_line(choice).expect("failed to read line");
+
+    io::stdin()
+        .read_line(choice)
+        .expect("unable to fetch operation input");
 }
