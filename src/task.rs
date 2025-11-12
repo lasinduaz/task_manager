@@ -2,7 +2,10 @@ use chrono::Local;
 use core::task;
 use std::io::{self, Write};
 
-use crate::{storage::{self, view_tasks}, utils};
+use crate::{
+    storage::{self, view_tasks},
+    utils,
+};
 
 #[derive(Debug)]
 
@@ -142,7 +145,9 @@ pub fn update() {
     println!("================================");
     println!("Please Enter ID number : ('#' for view tasks)");
     io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut id_upt).expect("Failed to get ID");
+    io::stdin()
+        .read_line(&mut id_upt)
+        .expect("Failed to get ID");
 
     let input = id_upt.trim();
     if input == "#" {
@@ -203,8 +208,23 @@ pub fn update() {
 
 pub fn delete() {
     println!("Delete tasks here");
-}
+    println!("================================");
+    println!("Please Enter ID number : ('#' for view tasks)");
+    let mut id_dete = String::new();
+    io::stdout().flush().unwrap();
+    io::stdin()
+        .read_line(&mut id_dete)
+        .expect("unable to capture input");
 
+    //return to menu 
+    if id_dete.trim() == "#" {
+        storage::view_tasks().expect("Failed to get view task");
+    }
+
+    //cov to int
+    let id_mut: i32 = id_dete.trim().parse::<i32>().expect("Invalid integer id");
+
+}
 //for update funtion
 // - First need to get id number
 // - Secound sent ID number to update functio at stroage for get data
